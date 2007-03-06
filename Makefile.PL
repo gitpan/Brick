@@ -1,4 +1,4 @@
-# $Id: Makefile.PL 2186 2007-03-06 19:20:58Z comdog $
+# $Id: Makefile.PL 2190 2007-03-06 19:30:31Z comdog $
 use ExtUtils::MakeMaker;
 
 eval "use Test::Manifest 1.14";
@@ -9,9 +9,10 @@ WriteMakefile(
 	'LICENSE'      => 'perl',
 	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
 	
-q	'PREREQ_PM'    => { 
-		'Test::More' => '0',
-		'DateTime'   => '0.36',
+	'PREREQ_PM'    => { 
+		'Test::More'     => '0',
+		'DateTime'       => '0.36',
+		'Test::Manifest' => '1.14',
 		},
 
 	'PM'           => {
@@ -26,6 +27,10 @@ q	'PREREQ_PM'    => {
 		'lib/Constraints.pm'  => '$(INST_LIBDIR)/Brick/Constraints.pm',
 		'lib/Filters.pm'      => '$(INST_LIBDIR)/Brick/Filters.pm',
 		'lib/Selectors.pm'    => '$(INST_LIBDIR)/Brick/Selectors.pm',
+
+
+		'lib/Tutorial.pm'     => '$(INST_LIBDIR)/Brick/Tutorial.pm',
+		'lib/UserGuide.pm'    => '$(INST_LIBDIR)/Brick/UserGuide.pm',
 		},
 
 	clean  => { FILES    => q|Brick-*| },

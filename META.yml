@@ -1,12 +1,13 @@
 --- #YAML:1.0
 name:                Brick
-version:             0.2186_01
+version:             0.2191_01
 abstract:            ~
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.31
 distribution_type:   module
 requires:     
     DateTime:                      0.36
+    Test::Manifest:                1.14
     Test::More:                    0
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.2.html

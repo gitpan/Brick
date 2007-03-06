@@ -1,4 +1,4 @@
-# $Id: Brick.pm 2186 2007-03-06 19:20:58Z comdog $
+# $Id: Brick.pm 2191 2007-03-06 19:36:16Z comdog $
 package Brick;
 use strict;
 
@@ -8,11 +8,11 @@ use vars qw($VERSION);
 use Carp qw( carp croak );
 use Data::Dumper;
 
-$VERSION = sprintf "0.%04d_01", q$Revision: 2186 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "0.%04d_01", q$Revision: 2191 $ =~ m/ (\d+) /xg;
 
 =head1 NAME
 
-Brick - This is the description
+Brick - Complex business rule data validation
 
 =head1 SYNOPSIS
 
@@ -77,11 +77,11 @@ sub _load_external_packages
 
 =item Brick->error( MESSAGE )
 
-The error message from the last things that happened.
+Set the error message from the last things that happened.
 
 =item Brick->error_str
 
-The error message from the last things that happened.
+Get the error message from the last things that happened.
 
 =cut
 
@@ -516,7 +516,7 @@ TBA
 
 =head1 SEE ALSO
 
-TBA
+L<Brick::Tutorial>, L<Brick::UserGuide>
 
 =head1 SOURCE AVAILABILITY
 
