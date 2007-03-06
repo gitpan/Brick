@@ -1,9 +1,9 @@
-# $Id: Constraints.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Constraints.pm 2186 2007-03-06 19:20:58Z comdog $
 package Brick::Constraints;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -64,7 +64,7 @@ sub __make_constraint # may need to change name to make generic
 		description => "Brick constraint sub for $name",
 
 		code        => sub {
-		my $input_hash = shift;
+			my $input_hash = shift;
 
 			my $result = eval{ $validator->( $input_hash ) };
 			die if $@;

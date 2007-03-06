@@ -1,6 +1,8 @@
-# $Id: pod_coverage.t 2153 2007-02-12 04:54:55Z comdog $
+# $Id: pod_coverage.t 2186 2007-03-06 19:20:58Z comdog $
 use Test::More;
 eval "use Test::Pod::Coverage 1.00";
 plan skip_all => "Test::Pod::Coverage 1.00 required for testing POD coverage" if $@;
-all_pod_coverage_ok();
+all_pod_coverage_ok(
+	{ coverage_class => 'Pod::Coverage::CountParents' }
+	);
 																						 

@@ -1,4 +1,4 @@
-# $Id: Bucket.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Bucket.pm 2186 2007-03-06 19:20:58Z comdog $
 package Brick::Bucket;
 use strict;
 
@@ -17,7 +17,7 @@ foreach my $package ( qw(Numbers Regexes Strings Dates General Composers Filters
 	print STDERR $@ if $@;
 	}
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
 
 =head1 NAME
 
@@ -81,6 +81,8 @@ sub entry_class { __PACKAGE__ . "::Entry"; }
 =over 4
 
 =item add_to_bucket( HASHREF )
+
+=item add_to_pool # DEPRECATED
 
 You can pass these entries in the HASHREF:
 
@@ -201,7 +203,7 @@ sub get_from_bucket
 	return exists $bucket->{$sub} ? $bucket->{$sub} : ();
 	}
 
-=item get_from_bucket_by_name( NAME )
+=item get_brick_by_name( NAME )
 
 Gets the code references for the bricks with the name NAME. Since
 bricks don't have to have a unique name, it might return more than
@@ -438,6 +440,16 @@ sub dump
 	Data::Dumper->Dump( [ $_[0]->entry( $_[1] ) ], [ "$_[1]" ] )
 	}
 
+=item $entry->applies_to_fields
+
+Return a list of fields the brick applies to.
+
+I don't think I've really figured this out, but the composers should be
+the ones to figure it out and add this stuff to the information that the
+bucket tracks.
+
+=cut
+
 sub applies_to_fields
 	{
 	my( $class, $sub, @fields ) = @_;
@@ -448,6 +460,7 @@ sub applies_to_fields
 		$class->registry->{_fields}{$field}{$sub}++;
 		}
 	}
+
 
 sub main::__caller_chain_as_list
 	{

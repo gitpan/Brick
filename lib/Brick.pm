@@ -1,4 +1,4 @@
-# $Id: Brick.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Brick.pm 2186 2007-03-06 19:20:58Z comdog $
 package Brick;
 use strict;
 
@@ -8,7 +8,7 @@ use vars qw($VERSION);
 use Carp qw( carp croak );
 use Data::Dumper;
 
-$VERSION = sprintf "0.%04d_01", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "0.%04d_01", q$Revision: 2186 $ =~ m/ (\d+) /xg;
 
 =head1 NAME
 
@@ -409,6 +409,8 @@ sub lint
 	}
 
 =item create_bucket( PROFILE_ARRAYREF )
+
+=item create_pool  # DEPRECATED
 
 This method creates a C<Brick::Bucket> instance (or an instance in
 the package returned by C<$brick->bucket_class> ) based on the profile

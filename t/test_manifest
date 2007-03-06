@@ -1,9 +1,9 @@
-# $Id: test_manifest 2158 2007-02-13 03:17:46Z comdog $
+# $Id: test_manifest 2187 2007-03-06 19:25:57Z comdog $
 load.t
-#pod.t
+pod.t
 #pod_coverage.t
 #prereq.t
-
+#;skip
 composers/load.t
 composers/__compose_satisfy_N_to_M.t
 composers/__compose_pass_or_stop.t

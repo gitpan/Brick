@@ -1,9 +1,9 @@
-# $Id: Composers.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Composers.pm 2186 2007-03-06 19:20:58Z comdog $
 package Brick::Composers;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
 
 use Brick::Bucket;
 
@@ -40,6 +40,10 @@ in programming rather than a failure of the data to validate.
 
 =item __compose_satisfy_all( LIST OF CODEREFS )
 
+This is AND with NO short-circuiting.
+
+	( A && B && C )
+	
 This function creates a new constraint that returns true if all of its
 constraints return true. All constraints are checked so there is no
 short-circuiting. This allows you to get back all of the errors at
@@ -55,6 +59,10 @@ sub __compose_satisfy_all
 
 =item __compose_satisfy_any( LIST OF CODEREFS )
 
+This is OR but with NO short-circuiting.
+
+	( A || B || C )
+	
 This function creates a new constraint that returns true if all of its
 constraints return true. All constraints are checked so there is no
 short-circuiting.
@@ -69,10 +77,15 @@ sub __compose_satisfy_any
 
 =item __compose_satisfy_none( LIST OF CODEREFS )
 
+
+	( NOT A && NOT B && NOT C )
+	
+	NOT ( A || B || C )
+
 This function creates a new constraint that returns true if all of its
 constraints return false. All constraints are checked so there is no
 short-circuiting.
-
+	
 =cut
 
 sub __compose_satisfy_none
@@ -151,7 +164,10 @@ sub __compose_satisfy_N_to_M
 	return $sub;
 	}
 
-=item __compose_not
+=item __compose_not( CODEREF )
+ 
+This composers negates the sense of the code ref. If the code ref returns
+true, this composer makes it false, and vice versa.
 
 =cut
 
@@ -231,7 +247,7 @@ Keep going as long as the closures return true.
 
 The closure that returns undef is a selector.
 
-If a closure doesn't die, don't fail, just move on. Return true for
+If a closure doesn't die and doesn't don't fail, just move on. Return true for
 the first one that passes, short-circuited the rest. If none of the
 closures pass, die with an error noting that nothing passed.
 
@@ -240,7 +256,7 @@ This can still die for programming (not logic) errors.
 
 	$result		$@			what		action
 	------------------------------------------------------------
-		1		undef		passed		go onto next closure
+		1		undef		passed		go on to next brick
 
 		undef	undef		selector	stop, return undef, no die
 							failed

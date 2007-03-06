@@ -1,11 +1,11 @@
-# $Id: Regexes.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Regexes.pm 2186 2007-03-06 19:20:58Z comdog $
 package Brick::Regexes;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -30,7 +30,7 @@ creation.
 
 =over 4
 
-=item matches_regex( HASHREF )
+=item _matches_regex( HASHREF )
 
 Create a code ref to apply a regular expression to the named field.
 
