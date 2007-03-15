@@ -1,11 +1,11 @@
-# $Id: Regexes.pm 2186 2007-03-06 19:20:58Z comdog $
+# $Id: Regexes.pm 2193 2007-03-15 06:41:50Z comdog $
 package Brick::Regexes;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2193 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -57,9 +57,10 @@ sub _matches_regex
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {
-				message => "The value in $setup->{field} [$_[0]->{ $setup->{field} }] did not match the pattern",
-				field   => $setup->{field},
-				handler => $caller[0]{'sub'},
+				message      => "[$_[0]->{ $setup->{field} }] did not match the pattern",
+				failed_field => $setup->{field},
+				failed_value => $_[0]->{ $setup->{field} },
+				handler      => $caller[0]{'sub'},
 				} unless $_[0]->{ $setup->{field} } =~ m/$setup->{regex}/;
 			},
 		} );

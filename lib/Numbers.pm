@@ -1,11 +1,11 @@
-# $Id: Numbers.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Numbers.pm 2193 2007-03-15 06:41:50Z comdog $
 package Brick::Numbers;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2193 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -168,7 +168,7 @@ sub _numeric_equal_or_greater_than
 		code        => sub {
 			die {
 				message => "The number in $setup->{field} was $_[0]->{ $setup->{field} }, but should have been greater than or equal to $setup->{minimum}",
-				field   => $setup->{field} ,
+				failed_field   => $setup->{field},
 				handler => $caller[0]{'sub'},
 				} unless $_[0]->{ $setup->{field} } >=  $setup->{minimum}
 			},
@@ -189,7 +189,7 @@ sub _numeric_strictly_greater_than
 		code        => sub {
 			die {
 				message => "The number in $setup->{field} was $_[0]->{ $setup->{field} }, but should have been strictly greater than $setup->{minimum}",
-				field   => $setup->{field} ,
+				failed_field   => $setup->{field},
 				handler => $caller[0]{'sub'},
 				} unless $_[0]->{ $setup->{field} } >  $setup->{minimum};
 			},
@@ -209,9 +209,9 @@ sub _numeric_equal_or_less_than
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {
-				message => "The number in $setup->{field} was $_[0]->{ $setup->{field} }, but should have been less than or equal to $setup->{maximum}",
-				field   => $setup->{field},
-				handler => $caller[0]{'sub'},
+				message      => "The number in $setup->{field} was $_[0]->{ $setup->{field} }, but should have been less than or equal to $setup->{maximum}",
+				failed_field => $setup->{field},
+				handler      => $caller[0]{'sub'},
 				} unless $_[0]->{ $setup->{field} } <=  $setup->{maximum};
 			},
 		} );
@@ -230,9 +230,9 @@ sub _numeric_strictly_less_than
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {
-				message => "The number in $setup->{field} was $_[0]->{ $setup->{field} }, but should have been strictly less than $setup->{maximum}",
-				field   => $setup->{field},
-				handler => $caller[0]{'sub'},
+				message      => "The number in $setup->{field} was $_[0]->{ $setup->{field} }, but should have been strictly less than $setup->{maximum}",
+				failed_field => $setup->{field},
+				handler      => $caller[0]{'sub'},
 				} unless $_[0]->{ $setup->{field} } <  $setup->{maximum};
 			},
 		} );
