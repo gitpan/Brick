@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Brick
-version:             0.2193_01
+version:             0.2195_01
 abstract:            ~
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.31
@@ -10,6 +10,7 @@ requires:
     Test::Data:                    0
     Test::Manifest:                1.14
     Test::More:                    0
+    Test::Output:                  0
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.2.html
     version: 1.2

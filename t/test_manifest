@@ -1,11 +1,11 @@
-# $Id: test_manifest 2193 2007-03-15 06:41:50Z comdog $
+# $Id: test_manifest 2196 2007-03-16 00:36:48Z comdog $
 load.t
 pod.t
 
 ;skip
-pod_coverage.t
+#pod_coverage.t
+#prereq.t
 ;unskip
-prereq.t
 
 composers/load.t
 composers/__compose_satisfy_N_to_M.t
@@ -35,6 +35,7 @@ filters/_remove_whitespace.t
 filters/_uppercase.t
 filters/_lowercase.t
 filters/_remove_extra_fields.t
+
 
 general/__fields_are_something.t
 general/_is_defined.t

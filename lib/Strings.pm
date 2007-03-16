@@ -1,11 +1,11 @@
-# $Id: Strings.pm 2193 2007-03-15 06:41:50Z comdog $
+# $Id: Strings.pm 2195 2007-03-16 00:32:16Z comdog $
 package Brick::Strings;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2193 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2195 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -50,6 +50,7 @@ sub _value_length_is_equal_to_greater_than
 
 	my @caller = main::__caller_chain_as_list();
 
+
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => "Length must be $setup->{minimum_length} or more characters",
@@ -78,7 +79,7 @@ sub _value_length_is_equal_to_less_than
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
-		description => "Length must be $setup->{minimum_length} or fewer characters",
+		description => "Length must be $setup->{maximum_length} or fewer characters",
 		code        => sub {
 			die {
 				message      => "[$_[0]->{ $setup->{field} }] isn't $setup->{maximum_length} or fewer characters",
