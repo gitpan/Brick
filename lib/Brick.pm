@@ -1,4 +1,4 @@
-# $Id: Brick.pm 2237 2007-03-24 05:00:53Z comdog $
+# $Id: Brick.pm 2244 2007-03-26 07:03:12Z comdog $
 package Brick;
 use strict;
 
@@ -8,8 +8,8 @@ use vars qw($VERSION);
 use Carp qw( carp croak );
 use Data::Dumper;
 
-$VERSION = '0.220_01';
-#sprintf "0.%04d_01", q$Revision: 2237 $ =~ m/(\d+)/g;
+$VERSION = '0.221_01';
+	#sprintf "0.%04d_01", q$Revision: 2244 $ =~ m/(\d+)/g;
 
 =head1 NAME
 
