@@ -1,4 +1,4 @@
-# $Id: test_manifest 2196 2007-03-16 00:36:48Z comdog $
+# $Id: test_manifest 2241 2007-03-25 05:20:15Z comdog $
 load.t
 pod.t
 
@@ -25,7 +25,7 @@ error.t
 init.t
 explain.t
 apply.t
-
+field_labels.t
 
 external/add_validator_packages.t
 external/new-external_packages.t
@@ -62,6 +62,8 @@ dates/days_between_dates_within_range.t
 dates/days_between_dates_outside_range.t
 dates/at_least_N_days_between.t
 dates/at_most_N_days_between.t
+
+files/has_file_extension.t
 
 regexes/_matches_regex.t
 

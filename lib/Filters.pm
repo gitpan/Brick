@@ -1,10 +1,10 @@
-# $Id: Filters.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Filters.pm 2238 2007-03-24 06:04:33Z comdog $
 package Brick::Filters;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -38,7 +38,7 @@ sub _uppercase
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
@@ -71,7 +71,7 @@ sub _lowercase
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
@@ -104,7 +104,7 @@ sub _remove_non_digits
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
@@ -142,7 +142,7 @@ sub _remove_whitespace
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
@@ -172,7 +172,7 @@ sub _remove_extra_fields
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	my %allowed = map { $_, 1 } @{ $setup->{filter_fields} };
 

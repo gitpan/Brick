@@ -1,4 +1,4 @@
-# $Id: Bucket.pm 2186 2007-03-06 19:20:58Z comdog $
+# $Id: Bucket.pm 2241 2007-03-25 05:20:15Z comdog $
 package Brick::Bucket;
 use strict;
 
@@ -10,14 +10,15 @@ use Carp;
 
 use Brick::Constraints;
 
-foreach my $package ( qw(Numbers Regexes Strings Dates General Composers Filters Selectors) )
+foreach my $package ( qw(Numbers Regexes Strings Dates General 
+	Composers Filters Selectors Files) )
 	{
 	# print STDERR "Requiring $package\n";
 	eval "require Brick::$package";
 	print STDERR $@ if $@;
 	}
 
-$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2241 $ =~ m/ (\d+) /xg;
 
 =head1 NAME
 
@@ -56,7 +57,8 @@ sub _init
 	{
 	my $self = shift;
 
-	$self->{_names} = {};
+	$self->{_names}        = {};
+	$self->{_field_labels} = {};
 	}
 
 =item entry_class
@@ -113,7 +115,7 @@ sub add_to_pool { croak "add_to_pool is now add_to_bucket" }
 sub add_to_bucket
 	{
 	require B;
-	my @caller = main::__caller_chain_as_list();
+	my @caller = __caller_chain_as_list();
 	# print STDERR Data::Dumper->Dump( [\@caller],[qw(caller)] );
 	my( $bucket, $setup ) = @_;
 
@@ -284,6 +286,77 @@ sub dump_bucket
 
 =back
 
+=head2 Field labels
+
+The bucket can store a dictionary that maps field names to arbitrary
+strings. This way, a brick can translate and input parameter name
+(e.g. a CGI input field name) into a more pleasing string for humans
+for its error messages. By providing methods in the bucket class,
+every brick has a chance to call them.
+
+=over 4
+
+=item use_field_labels( HASHREF )
+
+Set the hash that C<get_field_label> uses to map field names to 
+field labels.
+
+This method croaks if its argument isn't a hash reference. 
+
+=cut
+
+sub use_field_labels
+	{
+	croak "Not a hash reference!" unless UNIVERSAL::isa( $_[1], ref {} );
+	$_[0]->{_field_labels} = { %{$_[1]} };	
+	}
+
+=item get_field_label( FIELD )
+
+Retrieve the label for FIELD.
+
+=cut
+
+sub get_field_label
+	{
+	no warnings 'uninitialized';
+	$_[0]->{_field_labels}{ $_[1] };
+	}
+	
+=item set_field_label( FIELD, VALUE )
+
+Set the label for FIELD to VALUE. It returns VALUE.
+
+=cut
+
+sub set_field_label
+	{
+	$_[0]->{_field_labels}{ $_[1] } = $_[2];
+	}
+
+sub __caller_chain_as_list
+	{
+	my $level = 0;
+	my @Callers = ();
+
+	while( 1 )
+		{
+		my @caller = caller( ++$level );
+		last unless @caller;
+
+		push @Callers, {
+			level   => $level,
+			package => $caller[0],
+			'sub'   => $caller[3] =~ m/(?:.*::)?(.*)/,
+			};
+		}
+
+	#print STDERR Data::Dumper->Dump( [\@Callers], [qw(callers)] ), "-" x 73, "\n";
+	@Callers;
+	}
+	
+=back
+
 =head1 Brick::Bucket::Entry
 
 =cut
@@ -431,6 +504,8 @@ sub add_bit
 
 =item $entry->dump
 
+Print a text version of the entry.
+
 =cut
 
 sub dump
@@ -461,27 +536,6 @@ sub applies_to_fields
 		}
 	}
 
-
-sub main::__caller_chain_as_list
-	{
-	my $level = 0;
-	my @Callers = ();
-
-	while( 1 )
-		{
-		my @caller = caller( ++$level );
-		last unless @caller;
-
-		push @Callers, {
-			level   => $level,
-			package => $caller[0],
-			'sub'   => $caller[3] =~ m/(?:.*::)?(.*)/,
-			};
-		}
-
-	#print STDERR Data::Dumper->Dump( [\@Callers], [qw(callers)] ), "-" x 73, "\n";
-	@Callers;
-	}
 
 =back
 

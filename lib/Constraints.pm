@@ -1,9 +1,9 @@
-# $Id: Constraints.pm 2186 2007-03-06 19:20:58Z comdog $
+# $Id: Constraints.pm 2238 2007-03-24 06:04:33Z comdog $
 package Brick::Constraints;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -40,7 +40,7 @@ sub __make_constraint # may need to change name to make generic
 
 	$setup ||= {};
 
-	my @callers = main::__caller_chain_as_list();
+	my @callers = $bucket->__caller_chain_as_list();
 
 	#print STDERR Data::Dumper->Dump( [\@callers], [qw(callers)] ); use Data::Dumper;
 

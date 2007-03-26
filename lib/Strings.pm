@@ -1,11 +1,11 @@
-# $Id: Strings.pm 2195 2007-03-16 00:32:16Z comdog $
+# $Id: Strings.pm 2238 2007-03-24 06:04:33Z comdog $
 package Brick::Strings;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2195 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -48,7 +48,7 @@ sub _value_length_is_equal_to_greater_than
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 
 	$bucket->add_to_bucket( {
@@ -75,7 +75,7 @@ sub _value_length_is_equal_to_less_than
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},

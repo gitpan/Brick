@@ -1,9 +1,9 @@
-# $Id: Composers.pm 2186 2007-03-06 19:20:58Z comdog $
+# $Id: Composers.pm 2238 2007-03-24 06:04:33Z comdog $
 package Brick::Composers;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2186 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
 
 use Brick::Bucket;
 
@@ -11,8 +11,6 @@ package Brick::Bucket;
 use strict;
 
 use Carp qw(carp);
-use Storable qw(dclone);
-
 
 =head1 NAME
 
@@ -127,7 +125,7 @@ sub __compose_satisfy_N_to_M
 		return sub {};
 		}
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	my @composers = grep { /^__compose/ } map { $_->{sub} } @caller;
 
@@ -154,7 +152,7 @@ sub __compose_satisfy_N_to_M
 			die {
 				message => "Satisfied $count of $max sub-conditions, needed to satisfy $range",
 				handler => $caller[0]{'sub'},
-				errors  => dclone \@dies,
+				errors  => \@dies,
 				} unless $n <= $count and $count <= $m;
 			},
 		});
@@ -205,7 +203,7 @@ sub __compose_pass_or_skip
 		return sub {};
 		}
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	my $max = @subs;
 
@@ -231,7 +229,7 @@ sub __compose_pass_or_skip
 			die {
 				message => "Nothing worked! Unexpected failure of all branches",
 				handler => $caller[0]{'sub'},
-				errors  => dclone \@dies,
+				errors  => \@dies,
 				};
 			},
 		});
@@ -279,7 +277,7 @@ sub __compose_pass_or_stop
 		return sub {};
 		}
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	my $max = @subs;
 

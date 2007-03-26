@@ -1,16 +1,14 @@
-# $Id: Numbers.pm 2193 2007-03-15 06:41:50Z comdog $
+# $Id: Numbers.pm 2238 2007-03-24 06:04:33Z comdog $
 package Brick::Numbers;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2193 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
-
-use Storable qw(dclone);
 
 
 =head1 NAME
@@ -69,7 +67,7 @@ sub _is_only_decimal_digits
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	my $sub = $bucket->_matches_regex( {
 		description  => "The $setup->{field} value only has decimal digits",
@@ -94,7 +92,7 @@ sub _is_decimal_integer
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	no warnings 'uninitialized';
 	my $sub = $bucket->_matches_regex( {
@@ -121,12 +119,11 @@ sub _inclusive_within_numeric_range
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => "Find number within the range [$setup->{minimum}, $setup->{maximum}] inclusively",
-		args        => [ dclone $setup ],
 		fields      => [ $setup->{field} ],
 		code        => $bucket->__compose_satisfy_all(
 			$bucket->_numeric_equal_or_greater_than( $setup ),
@@ -139,12 +136,11 @@ sub _exclusive_within_numeric_range
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket( {
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => "Find number within the range [$setup->{minimum}, $setup->{maximum}] exclusively",
-		args        => [ dclone $setup ],
 		fields      => [ $setup->{field} ],
 		code        => $bucket->__compose_satisfy_all(
 			$bucket->_numeric_strictly_greater_than( $setup ),
@@ -158,12 +154,11 @@ sub _numeric_equal_or_greater_than
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket({
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => "The number is equal to or greater than $setup->{minimum}",
-		args        => [ dclone $setup ],
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {
@@ -179,12 +174,11 @@ sub _numeric_strictly_greater_than
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket({
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => "The number is greater than $setup->{minimum}",
-		args        => [ dclone $setup ],
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {
@@ -200,12 +194,11 @@ sub _numeric_equal_or_less_than
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket({
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => "The number is equal to or less than $setup->{maximum}",
-		args        => [ dclone $setup ],
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {
@@ -221,12 +214,11 @@ sub _numeric_strictly_less_than
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	$bucket->add_to_bucket({
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => "The number is less than $setup->{maximum}",
-		args        => [ dclone $setup ],
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {

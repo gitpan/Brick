@@ -1,11 +1,11 @@
-# $Id: General.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: General.pm 2238 2007-03-24 06:04:33Z comdog $
 package Brick::General;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -218,7 +218,7 @@ sub _fields_exist
 	{
 	my( $bucket, $setup, $sub ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	#print STDERR Data::Dumper->Dump( [\@caller], [qw(caller)] );
 
@@ -231,7 +231,6 @@ sub _fields_exist
 	my $composed = $bucket->add_to_bucket ( {
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => ( $setup->{description} || "Fields exist" ),
-		#args        => [ dclone $setup ],
 		fields      => [ $setup->{fields} ],
 		code        => sub {
 			my @errors;
@@ -285,7 +284,7 @@ sub __fields_are_something
 	{
 	my( $bucket, $setup, $sub ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	unless( eval { $setup->{fields}->isa( ref [] ) } or
 		UNIVERSAL::isa( $setup->{fields}, ref [] ) )
@@ -296,7 +295,6 @@ sub __fields_are_something
 	my $composed = $bucket->add_to_bucket ( {
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => ( $setup->{description} || "Fields exist" ),
-		#args        => [ dclone $setup ],
 		fields      => [ $setup->{fields} ],
 		code        => sub {
 

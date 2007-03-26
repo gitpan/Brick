@@ -1,17 +1,16 @@
-# $Id: Regexes.pm 2193 2007-03-15 06:41:50Z comdog $
+# $Id: Regexes.pm 2238 2007-03-24 06:04:33Z comdog $
 package Brick::Regexes;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2193 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
 
 use Carp qw(croak);
-use Storable qw(dclone);
 
 =head1 NAME
 
@@ -43,7 +42,7 @@ sub _matches_regex
 	{
 	my( $bucket, $setup ) = @_;
 
-	my @caller = main::__caller_chain_as_list();
+	my @caller = $bucket->__caller_chain_as_list();
 
 	unless( eval { $setup->{regex}->isa( ref qr// ) } )
 		{
@@ -53,7 +52,6 @@ sub _matches_regex
 	$bucket->add_to_bucket ( {
 		name        => $setup->{name} || $caller[0]{'sub'},
 		description => ( $setup->{description} || "Match a regular expression" ),
-		#args       => [ dclone $hash ],
 		fields      => [ $setup->{field} ],
 		code        => sub {
 			die {
