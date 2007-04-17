@@ -1,11 +1,13 @@
-# $Id: load.t 2181 2007-02-27 21:42:53Z comdog $
+# $Id: load.t 2250 2007-04-16 20:45:00Z comdog $
 $|++;
 
 BEGIN {
 	@classes = qw(Brick);
 	
 	push @classes, map { "Brick::$_" } qw(
-Bucket Composers Dates Filters		);
+		Bucket Composers Dates Filters
+		Profile Result
+		);
 	}
 
 use Test::More tests => 2 + scalar @classes;

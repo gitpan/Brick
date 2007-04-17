@@ -1,9 +1,9 @@
-# $Id: Composers.pm 2243 2007-03-26 06:55:17Z comdog $
+# $Id: Composers.pm 2251 2007-04-16 21:02:34Z comdog $
 package Brick::Composers;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2243 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2251 $ =~ m/ (\d+) /xg;
 
 use Brick::Bucket;
 
@@ -204,13 +204,17 @@ sub __compose_not
 	}
 
 
+=item __compose_until_pass
 
 =item __compose_pass_or_skip
 
-Go through the list of closures, trying each one until one suceeds. If a closure
-doesn't suceed, don't fail, just move on. Return true for the first one that
-passes, short-circuited the rest. If none of the closures pass, die with an
+Go through the list of closures, trying each one until one suceeds. If
+a closure doesn't die, but doesn't return true, this doesn't fail but
+just moves on. Return true for the first one that passes,
+short-circuited the rest. If none of the closures pass, die with an
 error noting that nothing passed.
+
+If one of the subs dies, this composer still dies.
 
 This can still die for programming (not logic) errors.
 
@@ -261,6 +265,12 @@ sub __compose_pass_or_skip
 
 	return $sub;
 	}
+
+BEGIN {
+*__compose_until_pass = *__compose_pass_or_skip;
+}
+
+=item __compose_until_fail
 
 =item __compose_pass_or_stop
 
@@ -338,6 +348,10 @@ sub __compose_pass_or_stop
 
 	return $sub;
 	}
+
+BEGIN {
+*__compose_until_fail = *__compose_pass_or_stop;
+}
 
 =back
 

@@ -1,9 +1,9 @@
 --- #YAML:1.0
 name:                Brick
-version:             0.221_01
+version:             0.222
 abstract:            ~
 license:             perl
-generated_by:        ExtUtils::MakeMaker version 6.31
+generated_by:        ExtUtils::MakeMaker version 6.32
 distribution_type:   module
 requires:     
     DateTime:                      0.36

@@ -1,9 +1,9 @@
-# $Id: Dates.pm 2238 2007-03-24 06:04:33Z comdog $
+# $Id: Dates.pm 2250 2007-04-16 20:45:00Z comdog $
 package Brick::Dates;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2250 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -40,7 +40,7 @@ sub _is_YYYYMMDD_date_format
 		name => $setup->{name} || $caller[0]{'sub'},
 		code => $bucket->_matches_regex( {
 			description  => "The $setup->{field} is in the YYYYMMDD date format",
-			failed_field => $setup->{field},
+			field        => $setup->{field},
 			name         => $caller[0]{'sub'},
 			regex        => qr/
 				\A

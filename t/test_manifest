@@ -1,11 +1,9 @@
-# $Id: test_manifest 2243 2007-03-26 06:55:17Z comdog $
+# $Id: test_manifest 2250 2007-04-16 20:45:00Z comdog $
 load.t
 pod.t
 
-;skip
 #pod_coverage.t
 #prereq.t
-;unskip
 
 composers/load.t
 composers/__compose_satisfy_N_to_M.t
@@ -59,6 +57,7 @@ messages/number_range_error.t
 
 dates/__get_ymd_as_hashref.t
 dates/_get_days_between.t
+dates/_is_YYYYMMDD_date_format.t
 dates/valid_date.t
 dates/ranges.t
 dates/days_between_dates_within_range.t

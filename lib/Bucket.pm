@@ -1,4 +1,4 @@
-# $Id: Bucket.pm 2241 2007-03-25 05:20:15Z comdog $
+# $Id: Bucket.pm 2248 2007-04-15 06:31:54Z comdog $
 package Brick::Bucket;
 use strict;
 
@@ -18,17 +18,17 @@ foreach my $package ( qw(Numbers Regexes Strings Dates General
 	print STDERR $@ if $@;
 	}
 
-$VERSION = sprintf "1.%04d", q$Revision: 2241 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2248 $ =~ m/ (\d+) /xg;
 
 =head1 NAME
 
-Brick - This is the description
+Brick::Bucket - The thing that keeps everything straight
 
 =head1 SYNOPSIS
 
-	use Brick::Constraints::Bucket;
+	use Brick::Bucket;
 
-	my $bucket = Brick::Constraints::Bucket->new();
+	my $bucket = Brick::Bucket->new();
 
 =head1 DESCRIPTION
 

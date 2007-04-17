@@ -1,4 +1,4 @@
-# $Id: Brick.pm 2244 2007-03-26 07:03:12Z comdog $
+# $Id: Brick.pm 2250 2007-04-16 20:45:00Z comdog $
 package Brick;
 use strict;
 
@@ -8,8 +8,10 @@ use vars qw($VERSION);
 use Carp qw( carp croak );
 use Data::Dumper;
 
-$VERSION = '0.221_01';
-	#sprintf "0.%04d_01", q$Revision: 2244 $ =~ m/(\d+)/g;
+use Brick::Profile;
+
+$VERSION = '0.222';
+	#sprintf "0.%04d_01", q$Revision: 2250 $ =~ m/(\d+)/g;
 
 =head1 NAME
 
@@ -23,7 +25,7 @@ Brick - Complex business rule data validation
 		external_packages => [ qw(Foo::Validator Bar::Validator) ]
 		} );
 
-	my @profile = (
+	my $profile = Brick::Profile->new( $brick,
 		[ required  => sub { .... }    => $hash ],
 		[ optional  => optional_fields => $hash ],
 
@@ -32,7 +34,12 @@ Brick - Complex business rule data validation
 		[ outside   => ex_number       => $hash ],
 		);
 
-	my $results = $brick->apply( \@profile, \%input );
+	my %input_from_app = (
+		name => 'Joe Snuffy',
+		...
+		);
+		
+	my $results = $brick->apply( $profile, \%%input_from_app );
 
 =head1 DESCRIPTION
 
@@ -159,7 +166,7 @@ sub create_bucket
 	{
 	my( $brick, $profile ) = @_;
 
-	unless( 0 == $brick->lint( $profile || [] ) ) # zero but true!
+	unless( 0 == $brick->profile_class->lint( $profile || [] ) ) # zero but true!
 		{
 		croak "Bad profile for create_bucket! Perhaps you need to check it with lint"
 		};
@@ -245,12 +252,12 @@ sub add_validator_packages
 
 Based on the current instance, create another one just like it but not
 connected to it (in effect forking the instance). After the C<clone>
-you can change new instance without affecting the old one. This is handy
-in C<explain>, for instance, where I want a deep copy for a moment. At least
-I think I want a deep copy.
+you can change new instance without affecting the old one. This is
+handy in C<explain>, for instance, where I want a deep copy for a
+moment. At least I think I want a deep copy.
 
-That's the idea. Right now this just returns the instance. When not using
-a copy breaks, I'll fix that.
+That's the idea. Right now this just returns the same instance. When
+not using a copy breaks, I'll fix that.
 
 =cut
 
@@ -261,107 +268,7 @@ sub clone
 	$brick;
 	}
 
-=item lint
-
-Examine the profile and complain about irregularities in format. This
-only checks the format; it does not try to determine if the profile
-works or makes sense. It returns a hash whose key is the index of the
-profile element and whose value is an anonymous hash to indicate what
-had the error:
-
-	format  -   the element is an arrayref
-	name    -   the name is a scalar
-	method  -   is a code ref or can be found in the package
-					$brick->bucket_class returns
-	args    -   the last element is a hash reference
-
-If the profile is not an array reference, C<lint> immediately returns
-undef or the empty list. In scalar context, C<lint> returns 0 for
-format success and the number of errors (so true) for format failures.
-If there is a format error (e.g. an element is not an array ref), it
-immediately returns the number of errors up to that point.
-
-	my $lint = $brick->lint( \@profile );
-
-	print do {
-		if( not defined $lint ) { "Profile must be an array ref\n" }
-		elsif( $lint )          { "Did not validate, had $lint problems" }
-		else                    { "Woo hoo! Everything's good!" }
-		};
-
-In list context, it returns a hash (a list of one element). The result
-will look something like this hash, which has keys for the elements
-that lint thinks are bad, and the values are anonymous hashes with
-keys for the parts that failed:
-
-	%lint = (
-		1 => {
-			method => "Could not find method foo in package",
-			},
-		4 => {
-			args => "Arguments should be a hash ref, but it was a scalar",
-			}
-		);
-
-If you are using C<AUTOLOAD> to generate some of the methods at
-runtime (i.e. after C<lint> has a chance to check for it), use a
-C<can> method to let C<lint> know that it will be available later.
-
-TO DO:
-
-Errors for duplicate names?
-
-=cut
-
-sub lint
-	{
-	my( $brick, $profile ) = @_;
-
-	return unless(
-		eval { $profile->isa( ref [] ) } or
-		UNIVERSAL::isa( $profile, ref [] )
-		);
-
-	my $lint = {};
-
-	foreach my $index ( 0 .. $#$profile )
-		{
-		my $h = $lint->{$index} = {};
-
-		unless( eval { $profile->[$index]->isa( ref [] ) } or
-			UNIVERSAL::isa(  $profile->[$index], ref [] )
-			)
-			{
-			$h->{format} = "Not an array reference!";
-			last;
-			}
-
-		my( $name, $method, $args ) = @{ $profile->[$index] };
-
-		$h->{name} = "Profile name is not a simple scalar!" if ref $name;
-
-		$h->{args} = "Couldn't find method [$method]" unless
-			eval { $method->isa( ref sub {} ) } or
-			UNIVERSAL::isa( $method, sub {} )    or
-			eval { $brick->bucket_class->can( $method ) }; #XXX which class though?
-
-		$h->{args} = "Args is not a hash reference" unless
-			eval { $args->isa( ref {} ) } or
-			UNIVERSAL::isa( $args, ref {} );
-
-		# args needs what?
-
-		delete $lint->{$index} if 0 == keys %{$lint->{$index}};
-		}
-
-#print STDERR Data::Dumper->Dump( [$lint], [qw(lint)] );
-#use Data::Dumper;
-
-	# set errors;
-	wantarray ? %$lint : ( scalar keys %$lint );
-	}
-
-=item explain( PROFILE_ARRAYREF )
+=item explain( PROFILE || PROFILE_ARRAYREF )
 
 Turn the profile into a textual description without applying it to any
 data. This does not add the profile to instance and it does not add
@@ -384,24 +291,35 @@ it in different ways (text output, hash output).
 
 sub explain
 	{
-	my( $brick, $profile ) = @_;
+	my( $brick, $profile_or_array ) = @_;
 
-	my $temp_bean = $brick->clone;
+	my $profile = do {
+		unless( eval { $profile_or_array->isa( $brick->profile_class ) } )
+			{
+			use Brick::Profile;
+			
+			eval "require " . $brick->profile_class;
+			
+			my $profile = $brick->profile_class->new( $brick, $profile_or_array );
 
-	if( $temp_bean->lint( $profile ) )
-		{
-		carp "Profile did not validate!";
-		return;
-		}
+			return unless eval { $profile->isa( $brick->profile_class ) };
+			
+			$profile;
+			}
+		else
+			{
+			$profile_or_array;
+			}
+		};
 
-	my( $bucket, $refs ) = $temp_bean->create_bucket( $profile );
-		#print STDERR Data::Dumper->Dump( [ $bucket ], [qw(bucket)] );
-		#print STDERR Data::Dumper->Dump( [ $refs ], [qw(refs)] );
+	my $bucket   = $profile->get_bucket;
+	my $coderefs = $profile->get_coderefs;
+	my $array    = $profile->get_array;
 
 	my @entries = map {
 		my $e = $bucket->get_from_bucket( $_ );
 		[ map { $e->$_ } qw(get_coderef get_name) ]
-		} @$refs;
+		} @$coderefs;
 
 	#print STDERR Data::Dumper->Dump( [ \@entries ], [qw(entries)] );
 
@@ -435,30 +353,56 @@ sub explain
 	$str;
 	}
 	
-=item apply(  PROFILE_ARRAYREF, INPUT_DATA_HASHREF )
+=item apply(  PROFILE_ARRAYREF | PROFILE OBJECT, INPUT_DATA_HASHREF )
 
-Apply the profile to the data in the input hash reference. It returns an
-array reference whose elements correspond to the elements in the profile.
+Apply the profile to the data in the input hash reference. The profile
+can either be a profile object or an array ref that apply() will use to
+create the profile object.
+
+This returns a results object blessed into the class name returned by
+results_class(), which is Brick::Result by default. If you don't like
+that, you can override it in your own subclass.
 
 =cut
 
 sub apply
 	{
-	my( $brick, $profile, $input ) = @_;
+	my( $brick, $profile_or_array, $input ) = @_;
 
-	my( $bucket, $refs ) = $brick->create_bucket( $profile );
-
+	my $profile = do {
+		unless( eval { $profile_or_array->isa( $brick->profile_class ) } )
+			{
+			use Brick::Profile;
+			
+			eval "require " . $brick->profile_class;
+			
+			my $profile = $brick->profile_class->new( $brick, $profile_or_array );
+						
+			return unless eval { $profile->isa( $brick->profile_class ) };
+			
+			$profile;
+			}
+		else
+			{
+			$profile_or_array;
+			}
+		};
+	
+	my $bucket   = $profile->get_bucket;
+	my $coderefs = $profile->get_coderefs;
+	my $array    = $profile->get_array;
+	
 	my @entries = map {
 		my $e = $bucket->get_from_bucket( $_ );
 		[ map { $e->$_ } qw(get_coderef get_name) ]
-		} @$refs;
+		} @$coderefs;
 
 	my @results = ();
 
 	foreach my $index ( 0 .. $#entries )
 		{
 		my $e    = $entries[$index];
-		my $name = $profile->[$index][0];
+		my $name = $array->[$index][0];
 
 		print STDERR "Checking $name...\n" if $ENV{DEBUG};
 
@@ -469,7 +413,7 @@ sub apply
 
 		$result = 0 if ref $eval_error;
 
-		my $handler = $profile->[$index][1];
+		my $handler = $array->[$index][1];
 
 		push @results, [ $name, $handler, $result, $@ ];
 		}
@@ -482,12 +426,14 @@ sub apply
 	
 	return bless \@results, $brick->result_class;
 	}
-	
+		
 =item bucket_class
 
-The namespace where the constraint building blocks are defined. By default
-this is C<Brick::Bucket>. If you don't like that, override this in a
-subclass.
+The namespace where the constraint building blocks are defined. By
+default this is C<Brick::Bucket>. If you don't like that, override
+this in a subclass. Things that need to work with the bucket class
+name, such as a factory method, will use the return value of this
+method.
 
 =cut
 
@@ -497,11 +443,23 @@ sub bucket_class { 'Brick::Bucket' }
 
 The namespace that C<apply> uses for its result object. By default
 this is C<Brick::Result>. If you don't like that, override this in a
-subclass.
+subclass. Things that need to work with the result class name, such as
+a factory method, will use the return value of this method.
 
 =cut
 
 sub result_class { 'Brick::Result' }
+
+=item profile_class
+
+The namespace for the profile object. By default this is
+C<Brick::Profile>. If you don't like that, override this in a
+subclass. Things that need to work with the result class name, such as
+a factory method, will use the return value of this method.
+
+=cut
+
+sub profile_class { require Brick::Profile; 'Brick::Profile' }
 
 =back
 
