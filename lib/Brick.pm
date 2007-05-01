@@ -1,4 +1,4 @@
-# $Id: Brick.pm 2250 2007-04-16 20:45:00Z comdog $
+# $Id: Brick.pm 2260 2007-05-01 22:46:29Z comdog $
 package Brick;
 use strict;
 
@@ -10,8 +10,8 @@ use Data::Dumper;
 
 use Brick::Profile;
 
-$VERSION = '0.222';
-	#sprintf "0.%04d_01", q$Revision: 2250 $ =~ m/(\d+)/g;
+$VERSION = '0.223';
+	#sprintf "0.%04d_01", q$Revision: 2260 $ =~ m/(\d+)/g;
 
 =head1 NAME
 
@@ -79,7 +79,7 @@ sub _load_external_packages
 	foreach my $package ( @packages )
 		{
 		eval "package $bucket_class; require $package; $package->import";
-		carp "Could not load $package: $@" if $@;
+		croak "Could not load $package: $@" if $@;
 		}
 
 	}
