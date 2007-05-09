@@ -1,9 +1,9 @@
-# $Id: Dates.pm 2250 2007-04-16 20:45:00Z comdog $
+# $Id: Dates.pm 2264 2007-05-09 17:06:24Z comdog $
 package Brick::Dates;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2250 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2264 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -152,6 +152,7 @@ sub _date_is_after
 
 			#print STDERR "date after: $start --> $in_date\n";
 			die {
+				handler => $setup->{name} || $caller[0]{'sub'},
 				message => "Date [$in_date] is not after start date [$start]",
 				failed_field => $setup->{field},
 				} if $in_date <= $start;
@@ -175,6 +176,7 @@ sub _date_is_before
 
 			#print STDERR "date before: $in_date --> $end\n";
 			die {
+				handler => $setup->{name} || $caller[0]{'sub'},
 				message => "Date [$in_date] is not before end date [$end]",
 				failed_field => $setup->{field},
 

@@ -1,9 +1,9 @@
-# $Id: Constraints.pm 2238 2007-03-24 06:04:33Z comdog $
+# $Id: Constraints.pm 2264 2007-05-09 17:06:24Z comdog $
 package Brick::Constraints;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2238 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2264 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -49,8 +49,9 @@ sub __make_constraint # may need to change name to make generic
 		carp "$callers[1]{'sub'} called from sub with leading underscore. Are you sure you want that?";
 		}
 
-	my $name = $setup->{name} || $callers[-1]{'sub'} || 'Anonymous';
-
+	my $name = $setup->{name} || $callers[1]{'sub'} || 'Anonymous';
+	print STDERR "Constraint name is $name\n" if $ENV{DEBUG};
+	
 	unless(
 		eval { $validator->isa( ref sub {} ) }    ||
 		UNIVERSAL::isa( $validator, ref sub {} )
