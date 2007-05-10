@@ -1,11 +1,11 @@
-# $Id: Selectors.pm 2183 2007-02-27 23:24:59Z comdog $
+# $Id: Selectors.pm 2271 2007-05-09 22:19:38Z comdog $
 package Brick::Selectors;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2271 $ =~ m/ (\d+) /xg;
 
 package Brick::Bucket;
 use strict;
@@ -21,7 +21,7 @@ Brick::Selectors - Connect the input data to the closures in the pool
 =head1 DESCRIPTION
 
 Selectors test a condition, but they don't fail if the test doesn't
-work. Instead of die-ing, they return the empty list. Composers can
+work. Instead of die-ing, they return C<0>. Composers can
 use selectors to decide if they want to continue with the rest of the
 composition or simply skip it and try something else. This requires
 something like C<Brick::Composers::__compose_pass_or_skip> or
@@ -92,7 +92,7 @@ tests the value with the key C<field>.
 
 sub _is_even_number
 	{
-	sub{ $_[0]->{field} % 2 ? () : 1 };
+	sub{ $_[0]->{field} % 2 ? 0 : 1 };
 	}
 
 =item _is_odd_number
@@ -107,7 +107,7 @@ tests the value with the key C<field>.
 
 sub _is_odd_number
 	{
-	sub{ $_[0]->{field} % 2 ? 1 : () };
+	sub{ $_[0]->{field} % 2 ? 1 : 0 };
 	}
 
 =item _is_tuesday
@@ -119,7 +119,7 @@ indicates it's Tuesday, and return the empty list otherwise.
 
 sub _is_tuesday
 	{
-	sub { (localtime)[6] == 2 ? 1 : () };
+	sub { (localtime)[6] == 2 ? 1 : 0 };
 	}
 
 =back

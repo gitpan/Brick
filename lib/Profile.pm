@@ -60,7 +60,7 @@ until you C<apply> it.
 
 =item new( BRICK, ARRAY_OF_ARRAYS )
 
-Create a new profile object tied to the BRICK object.
+Create a new profile object tied to the Brick object.
 
 =cut
 
@@ -68,6 +68,13 @@ sub new
 	{
 	my( $class, $brick, $array_ref ) = @_;
 	
+	unless( $brick->isa( __PACKAGE__->brick_class ) )
+		{
+		carp "First argument to " . __PACKAGE__ . " must be a brick object. " .
+			"Got [$brick]\n";
+		return;
+		}
+		
 	my $self = bless {}, $class;
 	
 	my $lint_errors = $class->lint( $array_ref );
@@ -86,6 +93,22 @@ sub new
 	
 	return $self;
 	}
+
+=item brick_class()
+
+Return the class name to use to access class methods (such as
+bucket_class) in the Brick namespace. If you want to provide
+an alternate Brick class for your profile, override this method.
+
+=cut
+
+sub brick_class { require Brick; 'Brick' }
+
+=back
+
+=head2 Instance methods
+
+=over
 
 =item lint( PROFILE_ARRAYREF );
 
@@ -107,7 +130,7 @@ format success and the number of errors (so true) for format failures.
 If there is a format error (e.g. an element is not an array ref), it
 immediately returns the number of errors up to that point.
 
-	my $lint = $brick->lint( \@profile );
+	my $lint = $brick->profile_class->lint( \@profile );
 
 	print do {
 		if( not defined $lint ) { "Profile must be an array ref\n" }
@@ -142,12 +165,12 @@ Errors for duplicate names?
 sub lint
 	{
 	my( $class, $array ) = @_;
-
+	
 	return unless(
 		eval { $array->isa( ref [] ) } or
 		UNIVERSAL::isa( $array, ref [] )
 		);
-
+	
 	my $lint = {};
 
 	foreach my $index ( 0 .. $#$array )
@@ -169,8 +192,8 @@ sub lint
 		$h->{args} = "Couldn't find method [$method]" unless
 			eval { $method->isa( ref sub {} ) } or
 			UNIVERSAL::isa( $method, sub {} )    or
-			eval { Brick->bucket_class->can( $method ) }; #XXX which class though?
-
+			eval { __PACKAGE__->brick_class->bucket_class->can( $method ) };
+			
 		$h->{args} = "Args is not a hash reference" unless
 			eval { $args->isa( ref {} ) } or
 			UNIVERSAL::isa( $args, ref {} );

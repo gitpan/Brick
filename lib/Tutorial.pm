@@ -198,8 +198,9 @@ really just another factory to create bricks.
 =head2 Selectors
 
 Selectors are a special sort of brick that doesn't C<die>. When it
-fails, it just returns false. I can use these with composers to decide
-if I want to continue with the rest of the bricks in that composition.
+fails, it just returns C<0> (not just false, but specifically 0). I
+can use these with composers to decide if I want to continue with the
+rest of the bricks in that composition.
 
 The composer C<__compose_pass_or_stop> can use a selector to stop
 processing. It won't C<die>, so it doesn't fail. It doesn't keep
@@ -283,17 +284,19 @@ To apply the profile, I pass it along with the input hash to C<apply>:
 	
 	my $Brick = Brick->new;
 	
-	$Brick->apply( \@Profile, \%input );
+	my $profile = $Brick->profile_class->new( \@Profile );
+	
+	$Brick->apply( $profile, \%input );
 
 Before I apply a profile, I might want to use C<lint> to check it for
-errors:
+errors. It's a class method since it hasn't created an object yet:
 
-	$Brick->lint( \@Profile );
+	$Brick->profile_class->lint( \@Profile );
 	
 I can dump the profile in a handy text format with C<explain> to see
 if it does what I want:
 
-	$Brick->explain( \@profile )
+	$profile->explain;
 
 
 =head1 SOURCE AVAILABILITY

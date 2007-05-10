@@ -1,4 +1,4 @@
-# $Id: Brick.pm 2264 2007-05-09 17:06:24Z comdog $
+# $Id: Brick.pm 2275 2007-05-10 19:43:45Z comdog $
 package Brick;
 use strict;
 
@@ -12,7 +12,7 @@ use UNIVERSAL qw(isa);
 use Brick::Profile;
 
 $VERSION = '0.223';
-	#sprintf "0.%04d_01", q$Revision: 2264 $ =~ m/(\d+)/g;
+	#sprintf "0.%04d_01", q$Revision: 2275 $ =~ m/(\d+)/g;
 
 =head1 NAME
 
@@ -269,92 +269,12 @@ sub clone
 	$brick;
 	}
 
-=item explain( PROFILE || PROFILE_ARRAYREF )
-
-Turn the profile into a textual description without applying it to any
-data. This does not add the profile to instance and it does not add
-the constraints to the bucket.
-
-If everything goes right, this returns a single string that represents
-the profile.
-
-If the profile does not pass the C<lint> test, this returns undef or the
-empty list.
-
-If you want to do something with a datastructure, you probably want to
-write a different method very similar to this instead of trying to parse
-the output.
-
-Future notes: maybe this is just really a dispatcher to things that do
-it in different ways (text output, hash output).
-
-=cut
-
 sub explain
 	{
-	my( $brick, $profile_or_array ) = @_;
-
-	my $profile = do {
-		unless( eval { $profile_or_array->isa( $brick->profile_class ) } )
-			{
-			use Brick::Profile;
-			
-			eval "require " . $brick->profile_class;
-			
-			my $profile = $brick->profile_class->new( $brick, $profile_or_array );
-
-			return unless eval { $profile->isa( $brick->profile_class ) };
-			
-			$profile;
-			}
-		else
-			{
-			$profile_or_array;
-			}
-		};
-
-	my $bucket   = $profile->get_bucket;
-	my $coderefs = $profile->get_coderefs;
-	my $array    = $profile->get_array;
-
-	my @entries = map {
-		my $e = $bucket->get_from_bucket( $_ );
-		[ map { $e->$_ } qw(get_coderef get_name) ]
-		} @$coderefs;
-
-	#print STDERR Data::Dumper->Dump( [ \@entries ], [qw(entries)] );
-
-	my $level = 0;
-	my $str   = '';
-	foreach my $index ( 0 .. $#entries )
-		{
-		my $tuple = $entries[$index];
-
-		my @uses = ( [ $level, $tuple->[0] ] );
-
-		#print STDERR Data::Dumper->Dump( [ \@uses ], [qw(uses)] );
-
-		while( my $pair = shift @uses )
-			{
-			my $entry = $bucket->get_from_bucket( $pair->[1] );
-			#print Data::Dumper->Dump( [ $entry ], [qw(entry)] );
-			next unless $entry;
-
-			$str .=  "\t" x $pair->[0] . $entry->get_name . "\n";
-
-			unshift @uses, map {
-				[ $pair->[0] + 1, $_ ]
-				} @{ $entry->get_comprises( $pair->[1] ) };
-			#print Data::Dumper->Dump( [ \@uses ], [qw(uses)] );
-			}
-
-		$str.= "\n";
-		}
-
-	$str;
+	croak "Who's calling Brick::explain? That's in Brick::Profile now!";
 	}
 	
-=item apply(  PROFILE_ARRAYREF | PROFILE OBJECT, INPUT_DATA_HASHREF )
+=item apply(  PROFILE OBJECT, INPUT_DATA_HASHREF )
 
 Apply the profile to the data in the input hash reference. The profile
 can either be a profile object or an array ref that apply() will use to
@@ -368,26 +288,10 @@ that, you can override it in your own subclass.
 
 sub apply
 	{
-	my( $brick, $profile_or_array, $input ) = @_;
+	my( $brick, $profile, $input ) = @_;
 
-	my $profile = do {
-		unless( eval { $profile_or_array->isa( $brick->profile_class ) } )
-			{
-			use Brick::Profile;
-			
-			eval "require " . $brick->profile_class;
-			
-			my $profile = $brick->profile_class->new( $brick, $profile_or_array );
-						
-			return unless eval { $profile->isa( $brick->profile_class ) };
-			
-			$profile;
-			}
-		else
-			{
-			$profile_or_array;
-			}
-		};
+	croak "Did not get a profile object in Brick::apply()!\n" 
+		unless eval { $profile->isa( $brick->profile_class ) };
 	
 	my $bucket   = $profile->get_bucket;
 	my $coderefs = $profile->get_coderefs;

@@ -1,9 +1,9 @@
-# $Id: Composers.pm 2264 2007-05-09 17:06:24Z comdog $
+# $Id: Composers.pm 2270 2007-05-09 20:21:21Z comdog $
 package Brick::Composers;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2264 $ =~ m/ (\d+) /xg;
+$VERSION = sprintf "1.%04d", q$Revision: 2270 $ =~ m/ (\d+) /xg;
 
 use Brick::Bucket;
 
@@ -257,12 +257,6 @@ sub __compose_pass_or_skip
 				# die for everything else - validation error
 				die if( ref $eval_error );  
 				};
-
-			die {
-				message => "Nothing worked! Unexpected failure of all branches",
-				handler => $caller[0]{'sub'},
-				errors  => \@dies,
-				} if @dies;
 				
 			return 0;
 			},

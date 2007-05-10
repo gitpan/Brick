@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Brick
-version:             0.024_01
+version:             0.224_02
 abstract:            ~
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.32
