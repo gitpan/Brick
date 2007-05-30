@@ -1,4 +1,4 @@
-# $Id: Makefile.PL 2284 2007-05-25 09:39:49Z comdog $
+# $Id: Makefile.PL 2288 2007-05-30 00:39:14Z comdog $
 use ExtUtils::MakeMaker;
 
 require 5.008;
@@ -7,7 +7,7 @@ eval "use Test::Manifest 1.14";
 
 WriteMakefile(
 	'NAME'	       => 'Brick',
-	'VERSION'      => '0.226_01',
+	'VERSION'      => '0.226_02',
 	'LICENSE'      => 'perl',
 	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
 	
