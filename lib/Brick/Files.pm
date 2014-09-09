@@ -1,16 +1,17 @@
-# $Id: Regexes.pm 2193 2007-03-15 06:41:50Z comdog $
 package Brick::File;
 use strict;
 
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2193 $ =~ m/ (\d+) /xg;
+$VERSION = '0.227';
 
 package Brick::Bucket;
 use strict;
 
 use Carp qw(croak);
+
+=encoding utf8
 
 =head1 NAME
 
@@ -32,47 +33,47 @@ creation.
 =cut
 
 # returns MIME type from File::MMagic on success, undef otherwise
-sub _file_magic_type 
+sub _file_magic_type
 	{
 	my( $bucket, $file ) = @_;
-		
+
 	require File::MMagic;
-	
-	my $mm = File::MMagic->new; 
-	
+
+	my $mm = File::MMagic->new;
+
 	my $format = $mm->checktype_filename( $file || '' );
-	
+
 	## File::MMagic returns the illegal "application/msword" for all
 	## microsoft junk.
 	## We map this to either application/x-msword (default)
 	## or application/vnd.ms-excel, depending on the extension
-	
+
 	my( $uploaded_ext ) = $file =~ m/\.(\w*)?$/g;
 
-	if( $format eq "application/msword" ) 
+	if( $format eq "application/msword" )
 		{
 		no warnings 'uninitialized';
-		
+
 		$format = ($uploaded_ext =~ /^xl[st]$/)
-			? 
-			"application/vnd.ms-excel" 
-				: 
+			?
+			"application/vnd.ms-excel"
+				:
 			"application/x-msword";
 		}
 	elsif( $format =~ m|x-system/x-error| )
 		{
 		$format = undef;
 		}
-		
+
 	return $format;
 	}
 
 sub _get_file_extensions_by_mime_type
 	{
 	my( $bucket, $type ) = @_;
-	
+
 	require MIME::Types;
-       
+
 	my $mime_types = MIME::Types->new;
 	my $t          = $mime_types->type( $type || '' );
 	my @extensions = $t ? $t->extensions : ();
@@ -84,7 +85,7 @@ Passes if the file matches one of the listed MIME types.
 
 	mime_types		array reference of possible MIME types
 	file_field		the name of the file to check
-	
+
 =cut
 
 sub is_mime_type {
@@ -96,14 +97,14 @@ sub is_mime_type {
 		{
     	croak( "The mime_types key must be an array reference!" );
 		}
-	
+
 	my $hash = {
 			name        => $setup->{name} || $caller[0]{'sub'},
 			description => ( $setup->{description} || "Match a file extension" ),
 			fields      => [ $setup->{field} ],
 			code        => sub {
 				my( $input ) = @_;
-				
+
 				die {
 					message      => "[$input->{ $setup->{file_field} }] did not exist.",
 					failed_field => $setup->{file_field},
@@ -119,7 +120,7 @@ sub is_mime_type {
 					failed_value => $input->{ $setup->{file_field} },
 					handler      => $caller[0]{'sub'},
 					} unless $mime_type;
-				
+
 				foreach my $expected_type ( @{ $setup->{mime_types} } )
 					{
 					return 1 if lc $mime_type eq lc $expected_type;
@@ -133,11 +134,11 @@ sub is_mime_type {
 					};
 				},
 			};
-			
+
 	$bucket->__make_constraint(
 		$bucket->add_to_bucket ( $hash )
-		);	
-	
+		);
+
 	}
 
 =item has_file_extension( HASH_REF )
@@ -145,16 +146,16 @@ sub is_mime_type {
 This constraint checks the filename against a list of extensions
 which are the elements of ARRAY_REF.
 
-	field			the name of the field holding the filename 
+	field			the name of the field holding the filename
 	extensions		an array reference of possible extensions
 
 =cut
 
 sub Brick::_get_file_extension # just a sub, not a method
-	{ 
+	{
 	lc +( split /\./, $_[0] )[-1];
 	}
-	
+
 sub has_file_extension
 	{
 	my( $bucket, $setup ) = @_;
@@ -167,14 +168,14 @@ sub has_file_extension
 		}
 
 	my %extensions = map { lc $_, 1 } @{ $setup->{extensions} };
-		
+
 	my $hash = {
 			name        => $setup->{name} || $caller[0]{'sub'},
 			description => ( $setup->{description} || "Match a file extension" ),
 			fields      => [ $setup->{field} ],
 			code        => sub {
 				my $extension = Brick::_get_file_extension( $_[0]->{ $setup->{field} } );
-				
+
 				die {
 					message      => "[$_[0]->{ $setup->{field} }] did not have the right extension",
 					failed_field => $setup->{field},
@@ -183,7 +184,7 @@ sub has_file_extension
 					} unless exists $extensions{ $extension };
 				},
 			};
-			
+
 	$bucket->__make_constraint(
 		$bucket->add_to_bucket ( $hash )
 		);
@@ -214,7 +215,7 @@ sub is_clamav_clean {
 			fields      => [ $setup->{field} ],
 			code        => sub {
 				my( $input ) = @_;
-				
+
 				die {
 					message      => "Could not find clamscan",
 					failed_field => $setup->{clamscan_location},
@@ -235,24 +236,24 @@ sub is_clamav_clean {
 					failed_value => $_[0]->{ $setup->{filename} },
 					handler      => $caller[0]{'sub'},
 					} unless -f $setup->{filename};
-				
+
 				my $results = do {
 					local $ENV{PATH} = '';
-					
+
 					`$clamscan --no-summary -i --stdout $setup->{filename}`;
 					};
-     			
+
 				die {
 					message      => "ClamAV complained: $results",
 					failed_field => $setup->{filename},
 					failed_value => $_[0]->{ $setup->{filename} },
 					handler      => $caller[0]{'sub'},
 					} if $results;
-					
+
 				1;
 				},
 			};
-			
+
 	$bucket->__make_constraint(
 		$bucket->add_to_bucket ( $hash )
 		);
@@ -324,13 +325,9 @@ TBA
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in CVS, as well as all of the previous releases.
+This source is in Github:
 
-	http://sourceforge.net/projects/brian-d-foy/
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -338,7 +335,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

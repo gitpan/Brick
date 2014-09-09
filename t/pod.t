@@ -1,4 +1,4 @@
-# $Id: pod.t 2153 2007-02-12 04:54:55Z comdog $
+# $Id$
 use Test::More;
 eval "use Test::Pod 1.00";
 plan skip_all => "Test::Pod 1.00 required for testing POD" if $@;

@@ -1,7 +1,8 @@
-# $Revision$
-
+package Brick::UserGuide;
 
 =pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -26,11 +27,11 @@ Brick what to do (see L<Brick::Profile>):
 		[ label => constraint_name => { setup hash } ],
 		...
 		);
-	
+
 	my $Brick = Brick->new();
-	
+
 	my $profile = $Brick->profile_class->new( \@Description );
-	
+
 When you C<apply> this profile, Brick does it's magic.
 
 	my $result = $Brick->apply( $profile, \%Input );
@@ -40,7 +41,7 @@ It validates one row of the anonymous array, saves the result, and moves on
 to the next anonymous array. At the end, you have the results in C<$result>,
 which is a C<Brick::Results> object.
 
-That anonymous array's elements correspond item for item to the elements in 
+That anonymous array's elements correspond item for item to the elements in
 the profile. The first element in C<$result> goes with the first element
 in C<@Profile>.
 
@@ -64,13 +65,9 @@ Each element in C<$result> is an anonymous array holding four items:
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases.
+This source is in Github:
 
-	svn co https://brian-d-foy.svn.sourceforge.net/svnroot/brian-d-foy brian-d-foy
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -78,7 +75,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

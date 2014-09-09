@@ -1,7 +1,8 @@
-# $Revision$
-
+package Brick::Tutorial
 
 =pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -40,12 +41,13 @@ condition.
 
 If the brick returns a false value (but didn't die), that means that
 the data did not pass the condition, but it's not a failure. This is
-for "selectors".
+for "selectors", which will let us figure out how to prune validation
+trees later.
 
 =item C<die>s with a reference
 
 If a brick C<die>s with a reference, it's like an exception. The brick
-uses an anonymous hash as the argument to die. That hash contains the
+uses an anonymous hash as the argument to C<die>. That hash contains the
 name of the brick, a message about why the brick failed, and perhaps a
 description of the brick.
 
@@ -71,18 +73,18 @@ I'll talk about that C<die> later.
 
 	my $sub = sub {
 		my $input = shift;
-		
+
 		return 1 if exists $input->{cat};
-		
-		die { 
+
+		die {
 			handler      => 'Cat key check',
 			failed_field => 'cat'
 			message      => "The input didn't have a field named 'cat'",
 			};
 		}
-			
+
 The brick doesn't do me much good until I add it to the bucket,
-though. My call to C<add_to_brick> returns the anonymous subroutine,
+though. My call to C<add_to_bucket> returns the anonymous subroutine,
 but also keeps track of it with a name and a description, as well as
 the details about which line of code it comes from and many other
 details.
@@ -95,7 +97,7 @@ details.
 
 The bucket has two major functions: it keeps track of the
 relationships between bricks so I can "explain" a business rule
-(discussed later), and so I can easily debug what I've done. Since I'm
+(discussed later) and so I can easily debug what I've done. Since I'm
 going to be making a lot of closures, I want to know where they came
 from in the code. I'd go crazy without being able to use the bucket to
 help me keep track of things. More on that coming up.
@@ -109,33 +111,33 @@ literal 'cat' before I now have a variable, C<$setup->{field}>, which
 came from the input to C<_input_key_exists>.
 
 	my $cat_brick = $bucket->_input_key_exists( { field => 'cat' } );
-	
+
 	my $dog_brick = $bucket->_input_key_exists( { field => 'dog' } );
-	
+
 Somewhere I defined the C<_input_key_exists> method so it shows
 up in the Bucket class:
 
 	package Brick::Bucket;
-	
+
 	sub _input_key_exists
 		{
 		my( $bucket, $setup ) = @_;
-		
+
 		$bucket->add_to_bucket( {
-			name        => '$setup->{field} key checker',
+			name        => "$setup->{field} key checker",
 			description => "The input didn't have a field named '$setup->{field}'",
 			code        => sub {
 				my $input = shift;
-				
+
 				return 1 if exists $input->{ $setup->{field} };
-				
-				die { 
+
+				die {
 					handler => 'Cat key check',
 					message => "The input didn't have a field named '$setup->{field}'",
 					};
 				},
 			} );
-		
+
 		}
 
 Every time I call C<_input_key_exists> I get a new brick, because it's
@@ -145,10 +147,10 @@ automatically adds the brick to the bucket.
 =head2 Composing bricks
 
 I'll build a business rule from several bricks. When I want to test a
-business rule, I run all of the bricks and look at their return value.
+business rule, I run all of the bricks and look at their return values.
 Instead of keeping track of a bunch of bricks, though, I'll compose
 them into larger structures so I only have to remember one thing. A
-composer simply creates a new brick based on the ones I give it. The
+composer simply creates a new, bigger brick based on the ones I give it. The
 bucket will keep track of the relationships for me.
 
 I create another factory that puts the bricks together. Inside
@@ -160,14 +162,14 @@ return true.
 	sub _cat_and_dog_exists
 		{
 		my( $bucket, $setup );
-		
-		my $cat_brick = $bucket->_input_key_exists( 
+
+		my $cat_brick = $bucket->_input_key_exists(
 			{ %$setup, field => 'cat' } );
-		
-		my $dog_brick = $bucket->_input_key_exists( 
+
+		my $dog_brick = $bucket->_input_key_exists(
 			{  %$setup, field => 'dog' } );
-		
-		
+
+
 		$bucket->__compose_satisfy_all( $cat_brick, $dog_brick );
 		}
 
@@ -180,14 +182,14 @@ to pass:
 	sub _either_cat_and_dog_exists
 		{
 		my( $bucket, $setup );
-		
-		my $cat_brick = $bucket->_input_key_exists( 
+
+		my $cat_brick = $bucket->_input_key_exists(
 			{ %$setup, field => 'cat' } );
-		
-		my $dog_brick = $bucket->_input_key_exists( 
+
+		my $dog_brick = $bucket->_input_key_exists(
 			{  %$setup, field => 'dog' } );
-		
-		
+
+
 		$bucket->__compose_satisfy_any( $cat_brick, $dog_brick );
 		}
 
@@ -232,9 +234,9 @@ whose name reflects what it does.
 	sub check_cat_and_dog
 		{
 		my( $bucket, $setup );
-		
+
 		my $brick = $bucket->_either_cat_and_dog_exists( $setup );
-		
+
 		my $constraint = $brick->__make_constraint( $brick, $setup );
 		}
 
@@ -256,7 +258,7 @@ anonymous arrays specify three things:
 =item A label
 
 The label can be anything. It reminds you which profile element you're
-working with.
+working with. It doesn't have to be unique, but it should be.
 
 =item A constraint name
 
@@ -271,7 +273,7 @@ is the C<$setup> variable seen in the examples.
 
 =back
 
-Here's a simple profile. 
+Here's a simple profile.
 
 	my @Profile = (
 		#  label          #method name       #setup
@@ -281,18 +283,18 @@ Here's a simple profile.
 To apply the profile, I pass it along with the input hash to C<apply>:
 
 	use Brick;
-	
+
 	my $Brick = Brick->new;
-	
+
 	my $profile = $Brick->profile_class->new( \@Profile );
-	
+
 	$Brick->apply( $profile, \%input );
 
 Before I apply a profile, I might want to use C<lint> to check it for
 errors. It's a class method since it hasn't created an object yet:
 
 	$Brick->profile_class->lint( \@Profile );
-	
+
 I can dump the profile in a handy text format with C<explain> to see
 if it does what I want:
 
@@ -301,13 +303,9 @@ if it does what I want:
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases.
+This source is in Github:
 
-	svn co https://brian-d-foy.svn.sourceforge.net/svnroot/brian-d-foy brian-d-foy
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -315,7 +313,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

@@ -1,4 +1,3 @@
-# $Id: Bucket.pm 2248 2007-04-15 06:31:54Z comdog $
 package Brick::Bucket;
 use strict;
 
@@ -10,7 +9,7 @@ use Carp;
 
 use Brick::Constraints;
 
-foreach my $package ( qw(Numbers Regexes Strings Dates General 
+foreach my $package ( qw(Numbers Regexes Strings Dates General
 	Composers Filters Selectors Files) )
 	{
 	# print STDERR "Requiring $package\n";
@@ -18,7 +17,9 @@ foreach my $package ( qw(Numbers Regexes Strings Dates General
 	print STDERR $@ if $@;
 	}
 
-$VERSION = sprintf "1.%04d", q$Revision: 2248 $ =~ m/ (\d+) /xg;
+$VERSION = '0.227';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -298,17 +299,17 @@ every brick has a chance to call them.
 
 =item use_field_labels( HASHREF )
 
-Set the hash that C<get_field_label> uses to map field names to 
+Set the hash that C<get_field_label> uses to map field names to
 field labels.
 
-This method croaks if its argument isn't a hash reference. 
+This method croaks if its argument isn't a hash reference.
 
 =cut
 
 sub use_field_labels
 	{
 	croak "Not a hash reference!" unless UNIVERSAL::isa( $_[1], ref {} );
-	$_[0]->{_field_labels} = { %{$_[1]} };	
+	$_[0]->{_field_labels} = { %{$_[1]} };
 	}
 
 =item get_field_label( FIELD )
@@ -322,7 +323,7 @@ sub get_field_label
 	no warnings 'uninitialized';
 	$_[0]->{_field_labels}{ $_[1] };
 	}
-	
+
 =item set_field_label( FIELD, VALUE )
 
 Set the label for FIELD to VALUE. It returns VALUE.
@@ -354,7 +355,7 @@ sub __caller_chain_as_list
 	#print STDERR Data::Dumper->Dump( [\@Callers], [qw(callers)] ), "-" x 73, "\n";
 	@Callers;
 	}
-	
+
 =back
 
 =head1 Brick::Bucket::Entry
@@ -549,13 +550,9 @@ TBA
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases.
+This source is in Github:
 
-	svn co https://brian-d-foy.svn.sourceforge.net/svnroot/brian-d-foy brian-d-foy
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -563,7 +560,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

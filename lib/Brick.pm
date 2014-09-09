@@ -1,4 +1,3 @@
-# $Id: Brick.pm 2275 2007-05-10 19:43:45Z comdog $
 package Brick;
 use strict;
 
@@ -7,12 +6,10 @@ use vars qw($VERSION);
 
 use Carp qw( carp croak );
 use Data::Dumper;
-use UNIVERSAL qw(isa);
 
 use Brick::Profile;
 
-$VERSION = '0.223';
-	#sprintf "0.%04d_01", q$Revision: 2275 $ =~ m/(\d+)/g;
+$VERSION = '0.227';
 
 =head1 NAME
 
@@ -39,7 +36,7 @@ Brick - Complex business rule data validation
 		name => 'Joe Snuffy',
 		...
 		);
-		
+
 	my $results = $brick->apply( $profile, \%%input_from_app );
 
 =head1 DESCRIPTION
@@ -183,7 +180,7 @@ sub create_bucket
 
 		$args->{code} = do {
 			if( eval { $method->isa( ref {} ) } or
-				UNIVERSAL::isa( $method, ref sub {} ) )
+				ref $method eq ref sub {} )
 				{
 				$method;
 				}
@@ -218,12 +215,12 @@ sub init
 
 	$self->{buckets} = [];
 
-	if( defined $args->{external_packages} && UNIVERSAL::isa( $args->{external_packages}, ref [] ) )
+	if( defined $args->{external_packages} && ref $args->{external_packages} eq ref [] )
 		{ # defined and array ref
 		$self->{external_packages} = $args->{external_packages};
 		}
 	elsif( defined $args->{external_packages} &&
-		! UNIVERSAL::isa( $args->{external_packages}, ref [] ) )
+		! ($args->{external_packages} eq ref []) )
 		{ # defined but not array ref
 		carp "'external_packages' value must be an anonymous array";
 		$self->{external_packages} = [];
@@ -273,7 +270,7 @@ sub explain
 	{
 	croak "Who's calling Brick::explain? That's in Brick::Profile now!";
 	}
-	
+
 =item apply(  PROFILE OBJECT, INPUT_DATA_HASHREF )
 
 Apply the profile to the data in the input hash reference. The profile
@@ -290,13 +287,13 @@ sub apply
 	{
 	my( $brick, $profile, $input ) = @_;
 
-	croak "Did not get a profile object in Brick::apply()!\n" 
+	croak "Did not get a profile object in Brick::apply()!\n"
 		unless eval { $profile->isa( $brick->profile_class ) };
-	
+
 	my $bucket   = $profile->get_bucket;
 	my $coderefs = $profile->get_coderefs;
 	my $array    = $profile->get_array;
-	
+
 	my @entries = map {
 		my $e = $bucket->get_from_bucket( $_ );
 		[ map { $e->$_ } qw(get_coderef get_name) ]
@@ -308,24 +305,24 @@ sub apply
 		{
 		my $e    = $entries[$index];
 		my $name = $array->[$index][0];
-		
+
 		my $bucket_entry = $bucket->get_from_bucket( "$e->[0]" );
 		my $sub_name     = $bucket_entry->get_name;
-		
+
 		my $result = eval{ $e->[0]->( $input ) };
 		my $eval_error = $@;
-		
-		carp "Brick: $sub_name: eval error \$\@ is not a string or hash reference"
-			unless( ! ref $eval_error or UNIVERSAL::isa( $eval_error, ref {} ) );
 
-		if( defined $eval_error and isa( $eval_error, ref {} ) )
+		carp "Brick: $sub_name: eval error \$\@ is not a string or hash reference"
+			unless( ! ref $eval_error or ref $eval_error eq ref {} );
+
+		if( defined $eval_error and ref $eval_error eq ref {} )
 			{
 			$result = 0;
 			carp "Brick: $sub_name died with reference, but didn't define 'handler' key"
 				unless exists $eval_error->{handler};
-				
+
 			carp "Brick: $sub_name died with reference, but didn't define 'message' key"
-				unless exists $eval_error->{message};	
+				unless exists $eval_error->{message};
 			}
 		elsif( defined $eval_error ) # but not a reference
 			{
@@ -336,7 +333,7 @@ sub apply
 				errors        => [],
 				};
 			}
-			
+
 		my $handler = $array->[$index][1];
 
 		my $result_item = $brick->result_class->result_item_class->new(
@@ -345,13 +342,13 @@ sub apply
 			result   => $result,
 			messages => $eval_error,
 			);
-			
+
 		push @results, $result_item;
 		}
-	
+
 	return bless \@results, $brick->result_class;
 	}
-		
+
 =item bucket_class
 
 The namespace where the constraint building blocks are defined. By
@@ -360,7 +357,7 @@ this in a subclass. Things that need to work with the bucket class
 name, such as a factory method, will use the return value of this
 method.
 
-This method also loads the right class, so if you override it, 
+This method also loads the right class, so if you override it,
 remember to load the class too!
 
 =cut
@@ -374,7 +371,7 @@ this is C<Brick::Result>. If you don't like that, override this in a
 subclass. Things that need to work with the result class name, such as
 a factory method, will use the return value of this method.
 
-This method also loads the right class, so if you override it, 
+This method also loads the right class, so if you override it,
 remember to load the class too!
 
 =cut
@@ -388,7 +385,7 @@ C<Brick::Profile>. If you don't like that, override this in a
 subclass. Things that need to work with the result class name, such as
 a factory method, will use the return value of this method.
 
-This method also loads the right class, so if you override it, 
+This method also loads the right class, so if you override it,
 remember to load the class too!
 
 =cut
@@ -407,13 +404,9 @@ L<Brick::Tutorial>, L<Brick::UserGuide>
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases.
+This source is in Github:
 
-	svn co https://brian-d-foy.svn.sourceforge.net/svnroot/brian-d-foy brian-d-foy
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -421,7 +414,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

@@ -1,13 +1,13 @@
-# $Id: Selectors.pm 2183 2007-02-27 23:24:59Z comdog $
 package Brick::Result;
 use strict;
 
 use vars qw($VERSION);
 
 use Carp qw(carp croak);
-use UNIVERSAL qw(isa);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2183 $ =~ m/ (\d+) /xg;
+$VERSION = '0.227';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -16,11 +16,11 @@ Brick::Result - the result of applying a profile
 =head1 SYNOPSIS
 
 	use Brick;
-	
+
 	my $result = $brick->apply( $Profile, $Input );
 
 	$result->explain;
-	
+
 =head1 DESCRIPTION
 
 This class provides methods to turn the data structure returned
@@ -65,23 +65,23 @@ sub explain
 	my $str   = '';
 
 	foreach my $element ( @$result_set )
-		{		
+		{
 		my $level = 0;
-		
+
 		$str .= "$$element[0]: " . do {
 			if( $element->passed )                  { "passed " }
 			elsif( $element->is_validation_error )  { "failed " }
 			elsif( $element->is_code_error )        { "code error in " }
 			};
-			
+
 		$str .= $element->get_method() . "\n";
-		
+
 		if( $element->passed )
 			{
 			$str .= "\n";
 			next;
 			}
-		
+
 		# this descends into the error tree (without using recursion
 		my @uses = ( [ $level, $element->get_messages ] );
 
@@ -92,7 +92,7 @@ sub explain
 				{
 				$str .= $pair->[ MESSAGE ] . "foo";
 				}
-			elsif( ! UNIVERSAL::isa( $pair->[ MESSAGE ], ref {} ) )
+			elsif( ! ref $pair->[ MESSAGE ] eq ref {} )
 				{
 				next;
 				}
@@ -107,8 +107,8 @@ sub explain
 				{
 				# this could come back as an array ref instead of a string
 				no warnings 'uninitialized';
-				$str .=  "\t" . #x $pair->[ LEVEL ] . 
-					join( ": ", @{ $pair->[ MESSAGE ] 
+				$str .=  "\t" . #x $pair->[ LEVEL ] .
+					join( ": ", @{ $pair->[ MESSAGE ]
 						}{qw(failed_field handler message)} ) . "\n";
 				}
 
@@ -133,23 +133,23 @@ sub flatten
 	my $str   = '';
 
 	my @flatten;
-	
+
 	foreach my $element ( @$result_set ) # one element per profile element
 		{
 		bless $element, $result_set->result_item_class;
 		next if $element->passed;
 		my $constraint = $element->get_method;
-		
+
 		my @uses = ( $element->get_messages );
 
 		while( my $hash = shift @uses )
 			{
-			if( ! isa $hash, ref {} )
+			if( ! ref $hash eq ref {} )
 				{
 				carp "Non-hash reference in messages result key! Skipping";
 				next;
 				}
-				
+
 			# is it a single error or a composition?
 			unless( ref $hash  )
 				{
@@ -185,12 +185,12 @@ sub flatten_by_field
 
 	my %flatten;
 	my %Seen;
-	
+
 	foreach my $element ( @$result_set ) # one element per profile element
 		{
 		next if $element->passed;
 		my $constraint = $element->get_method;
-		
+
 		my @uses = ( $element->get_messages );
 
 		while( my $hash = shift @uses )
@@ -207,9 +207,9 @@ sub flatten_by_field
 			else
 				{
 				my $field = $hash->{failed_field};
-				next if $hash->{handler} and $Seen{$field}{$hash->{handler}}++;				
+				next if $hash->{handler} and $Seen{$field}{$hash->{handler}}++;
 				$flatten{ $field } = [] unless exists $flatten{ $field };
-				push @{ $flatten{ $field } }, 
+				push @{ $flatten{ $field } },
 					{ %$hash, constraint => $constraint };
 				$Seen{$field}{$hash->{handler}}++;
 				}
@@ -235,12 +235,12 @@ sub flatten_by
 
 	my %flatten;
 	my %Seen;
-	
+
 	foreach my $element ( @$result_set ) # one element per profile element
 		{
 		next if $element->passed;
 		my $constraint = $element->get_method;
-		
+
 		my @uses = ( $element->get_messages );
 
 		while( my $hash = shift @uses )
@@ -257,9 +257,9 @@ sub flatten_by
 			else
 				{
 				my $field = $hash->{$key};
-				next if $hash->{handler} and $Seen{$field}{$hash->{handler}}++;				
+				next if $hash->{handler} and $Seen{$field}{$hash->{handler}}++;
 				$flatten{ $field } = [] unless exists $flatten{ $field };
-				push @{ $flatten{ $field } }, 
+				push @{ $flatten{ $field } },
 					{ %$hash, constraint => $constraint };
 				$Seen{$field}{$hash->{handler}}++;
 				}
@@ -270,7 +270,7 @@ sub flatten_by
 
 	\%flatten;
 	}
-	
+
 =item dump
 
 What should this do?
@@ -291,13 +291,9 @@ L<Brick::Tutorial>, L<Brick::UserGuide>
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases.
+This source is in Github:
 
-	svn co https://brian-d-foy.svn.sourceforge.net/svnroot/brian-d-foy brian-d-foy
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -305,7 +301,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

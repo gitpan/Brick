@@ -1,9 +1,8 @@
-# $Id: Constraints.pm 2264 2007-05-09 17:06:24Z comdog $
 package Brick::Constraints;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2264 $ =~ m/ (\d+) /xg;
+$VERSION = '0.227';
 
 package Brick::Bucket;
 use strict;
@@ -11,6 +10,8 @@ use strict;
 use subs qw();
 
 use Carp qw(croak carp);
+
+=encoding utf8
 
 =head1 NAME
 
@@ -51,7 +52,7 @@ sub __make_constraint # may need to change name to make generic
 
 	my $name = $setup->{name} || $callers[1]{'sub'} || 'Anonymous';
 	print STDERR "Constraint name is $name\n" if $ENV{DEBUG};
-	
+
 	unless(
 		eval { $validator->isa( ref sub {} ) }    ||
 		UNIVERSAL::isa( $validator, ref sub {} )
@@ -146,13 +147,9 @@ TBA
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases.
+This source is in Github:
 
-	svn co https://brian-d-foy.svn.sourceforge.net/svnroot/brian-d-foy brian-d-foy
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -160,7 +157,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

@@ -1,9 +1,8 @@
-# $Id: Composers.pm 2270 2007-05-09 20:21:21Z comdog $
 package Brick::Composers;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = sprintf "1.%04d", q$Revision: 2270 $ =~ m/ (\d+) /xg;
+$VERSION = '0.227';
 
 use Brick::Bucket;
 
@@ -11,6 +10,8 @@ package Brick::Bucket;
 use strict;
 
 use Carp qw(carp);
+
+=encoding utf8
 
 =head1 NAME
 
@@ -43,7 +44,7 @@ in programming rather than a failure of the data to validate.
 This is AND with NO short-circuiting.
 
 	( A && B && C )
-	
+
 This function creates a new constraint that returns true if all of its
 constraints return true. All constraints are checked so there is no
 short-circuiting. This allows you to get back all of the errors at
@@ -68,7 +69,7 @@ BEGIN {
 This is OR but with NO short-circuiting.
 
 	( A || B || C )
-	
+
 This function creates a new constraint that returns true if all of its
 constraints return true. All constraints are checked so there is no
 short-circuiting.
@@ -91,13 +92,13 @@ BEGIN {
 
 
 	( NOT A && NOT B && NOT C )
-	
+
 	NOT ( A || B || C )
 
 This function creates a new constraint that returns true if all of its
 constraints return false. All constraints are checked so there is no
 short-circuiting.
-	
+
 =cut
 
 sub __compose_satisfy_none
@@ -166,13 +167,13 @@ sub __compose_satisfy_N_to_M
 				};
 
 			my $range = $n == $m ? "exactly $n" : "between $n and $m";
-			
+
 			die {
 				message => "Satisfied $count of $max sub-conditions, needed to satisfy $range",
 				handler => $caller[0]{'sub'},
 				errors  => \@dies,
 				} unless $n <= $count and $count <= $m;
-				
+
 			return 1;
 			},
 		});
@@ -185,7 +186,7 @@ sub __compose_satisfy_N_to_M
 =item __not( CODEREF )
 
 =item __compose_not( CODEREF )
- 
+
 This composers negates the sense of the code ref. If the code ref returns
 true, this composer makes it false, and vice versa.
 
@@ -214,10 +215,10 @@ something succeeds, it returns the name of the subroutine that passed.
 If
 a closure doesn't die, but doesn't return true, this doesn't fail but
 just moves on. Return true for the first one that passes,
-short-circuited the rest. 
+short-circuited the rest.
 
 If none of the closures pass (and none of them die), return 0. This might
-be the odd case of a several selectors (see L<Brick::Selector>), none of 
+be the odd case of a several selectors (see L<Brick::Selector>), none of
 which pass.
 
 If one of the subs dies, this composer still dies. This can also die
@@ -249,15 +250,15 @@ sub __compose_pass_or_skip
 
 				# all true values are success
 				return "$sub" if $result;   # we know we passed
-				
-				
+
+
 				# we're a selector: failed with no error
-				return if ( ! defined $result and ! defined $eval_error );  
+				return if ( ! defined $result and ! defined $eval_error );
 
 				# die for everything else - validation error
-				die if( ref $eval_error );  
+				die if( ref $eval_error );
 				};
-				
+
 			return 0;
 			},
 		});
@@ -366,13 +367,9 @@ TBA
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases.
+This source is in Github:
 
-	svn co https://brian-d-foy.svn.sourceforge.net/svnroot/brian-d-foy brian-d-foy
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/brick
 
 =head1 AUTHOR
 
@@ -380,7 +377,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 
