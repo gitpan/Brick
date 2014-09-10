@@ -26,4 +26,4 @@ requires:
   Test::Manifest: 1.14
   Test::More: 0
   Test::Output: 0
-version: 0.227
+version: 0.227_01
